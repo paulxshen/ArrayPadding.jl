@@ -1,6 +1,6 @@
 # Pad.jl
  
-Pads arrays of any dimension with various border options including constants, periodic, symmetric, mirror and smooth. Can control amount of padding applied to the left and right side of each dimension. Fully differentiable (compatible with `Zygote.jl` `Flux.jl`)
+Pads arrays of any dimension with various border options including constants, periodic, symmetric, mirror and smooth. Can control amount of ArrayPadding applied to the left and right side of each dimension. Fully differentiable (compatible with `Zygote.jl` `Flux.jl`)
 
 ## Border options
 - `:periodic`: a b c | a
@@ -11,7 +11,7 @@ Pads arrays of any dimension with various border options including constants, pe
 
 ## Usage
 ```julia
-using Padding
+using ArrayPadding
 
 a = [1 2; 3 4]
 

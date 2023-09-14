@@ -1,4 +1,4 @@
-module Padding
+module ArrayPadding
 include("main.jl")
 export pad
 
