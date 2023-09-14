@@ -10,7 +10,7 @@ Pads arrays of any dimension with various border options including constants, pe
 - any other value `v`: a b c | v
 
 ## Usage
-julia```
+```julia
 a = [1 2; 3 4]
 
 @test pad(a, -1, 1) == [
