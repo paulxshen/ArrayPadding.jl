@@ -11,7 +11,7 @@ Pads arrays of any dimension with various border options including constants, pe
 
 ## Usage
 ```julia
-using Pad 
+using Padding
 
 a = [1 2; 3 4]
 
