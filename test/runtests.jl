@@ -1,16 +1,6 @@
-# Pad.jl
- 
-Pads arrays of any dimension with various border options including constants, periodic, symmetric, mirror and smooth. Can control amount of padding applied to the left and right side of each dimension. Fully differentiable (compatible with `Zygote.jl` `Flux.jl`)
+using Test
+include("../src/main.jl")
 
-## Border options
-- `:periodic`: a b c | a
-- `:symmetric`: a b c | c
-- `:mirror`: a b c | b
-- `:smooth`: a b c | 2c-b (Maintains C1 continuity)
-- any other value `v`: a b c | v
-
-## Usage
-julia```
 a = [1 2; 3 4]
 
 @test pad(a, -1, 1) == [
@@ -59,4 +49,3 @@ a = [1 2; 3 4]
     2 3 4 5
     4 5 6 7
 ]
-```
