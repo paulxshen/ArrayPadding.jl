@@ -1,4 +1,4 @@
-# Pad.jl
+# ArrayPadding.jl
  
 Pads arrays of any dimension with various border options including constants, periodic, symmetric, mirror and smooth. Can control amount of ArrayPadding applied to the left and right side of each dimension. Fully differentiable (compatible with `Zygote.jl` `Flux.jl`)
 
