@@ -1,6 +1,20 @@
 """
+    pad(array, border, pad_amount)
+    pad(array, border, left_pad_amount, right_pad_amount)
+    pad(array, border, pad_amounts_for_dims)
+    pad(array, border, left_pad_amount_for_dims, right_pad_amount_for_dims)
+
+Pads arrays of any dimension with various border options including constants, periodic, symmetric, mirror and smooth. Can control amount of padding applied to the left and right side of each dimension. Fully differentiable (compatible with `Zygote.jl` `Flux.jl`)
+
+## Border options
+- `:periodic`: a b c | a
+- `:symmetric`: a b c | c
+- `:mirror`: a b c | b
+- `:smooth`: a b c | 2c-b (Maintains C1 continuity)
+- any other value `v`: a b c | v
 """
 function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l)
+    # - `:C1`: a b c | 2c-b (Maintains C1 continuity)
     d = ndims(a)
     for (i, l, r) in zip(1:d, l, r)
         if l > 0
