@@ -1,3 +1,5 @@
+"""
+"""
 function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l)
     d = ndims(a)
     for (i, l, r) in zip(1:d, l, r)
@@ -6,10 +8,10 @@ function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l)
                 I = [j == i ? ((size(a, i)-l+1):size(a, i)) : (:) for j = 1:d]
                 al = a[I...]
             elseif b == :symmetric
-                I = [j == i ? (l:1) : (:) for j = 1:d]
+                I = [j == i ? (l:-1:1) : (:) for j = 1:d]
                 al = a[I...]
             elseif b == :mirror
-                I = [j == i ? (l+1:2) : (:) for j = 1:d]
+                I = [j == i ? (l+1:-1:2) : (:) for j = 1:d]
                 al = a[I...]
             elseif b == :smooth
                 I = [j == i ? (1:1) : (:) for j = 1:d]
@@ -28,10 +30,10 @@ function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l)
                 I = [j == i ? (1:r) : (:) for j = 1:d]
                 ar = a[I...]
             elseif b == :symmetric
-                I = [j == i ? axes(a, i)[end:end-r+1] : (:) for j = 1:d]
+                I = [j == i ? axes(a, i)[end:-1:end-r+1] : (:) for j = 1:d]
                 ar = a[I...]
             elseif b == :mirror
-                I = [j == i ? axes(a, i)[end-1:end-r] : (:) for j = 1:d]
+                I = [j == i ? axes(a, i)[end-1:-1:end-r] : (:) for j = 1:d]
                 ar = a[I...]
             elseif b == :smooth
                 I = [j == i ? axes(a, i)[end:end] : (:) for j = 1:d]
@@ -60,3 +62,4 @@ function pad(a::AbstractArray, b, l::Int=1, r=l)
     d = ndims(a)
     pad(a, b, fill(l, d,), fill(r, d))
 end
+
