@@ -8,3 +8,4 @@ LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
 
 [compat]
 julia = "1.9"
+LazyArrays = "1.8"
