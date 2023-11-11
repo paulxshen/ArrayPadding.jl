@@ -78,3 +78,5 @@ a = [1 2; 3 4]
     4 5 6 7
 ]
 ```
+## Contributing
+Consider supporting on [Patreon](https://patreon.com/pxshen?utm_medium=clipboard_copy&utm_source=copyLink&utm_campaign=creatorshare_creator&utm_content=join_link) if you found this repo helpful. Feel free to request features or contribute PRs :)
