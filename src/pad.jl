@@ -1,17 +1,6 @@
 using LazyArrays
+include("utils.jl")
 
-function cat(a...; lazy=false, dims)
-    if lazy
-        if dims == 1
-            return ApplyArray(vcat, a...)
-        elseif dims == 2
-            return ApplyArray(hcat, a...)
-        else
-            error("lazy padding only supported up to dim 2")
-        end
-    end
-    Base.cat(a...; dims)
-end
 """
     pad(array, border, pad_amount)
     pad(array, border, left_pad_amount, right_pad_amount)
@@ -54,6 +43,11 @@ function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l; lazy=fals
                     I2 = [j == i ? (2:2) : (:) for j = 1:d]
                     al = 2view(a, I...) - a[I2...]
                 end
+            elseif isa(b, ReplicateRamp)
+                I = [j == i ? (1:1) : (:) for j = 1:d]
+                v = a[I...]
+                Δ = (b.v .- v) / l
+                al = v .+ cat([c * Δ for c = l-1:-1:0]..., dims=i)
             else
                 al = fill(b, [j == i ? l : size(a, j) for j = 1:d]...)
             end
@@ -80,6 +74,11 @@ function pad(a::AbstractArray, b, l::Union{AbstractVector,Tuple}, r=l; lazy=fals
                     I2 = [j == i ? axes(a, i)[end-1:end-1] : (:) for j = 1:d]
                     ar = 2view(a, I...) - a[I2...]
                 end
+            elseif isa(b, ReplicateRamp)
+                I = [j == i ? axes(a, i)[end:end] : (:) for j = 1:d]
+                v = a[I...]
+                Δ = (b.v .- v) / r
+                ar = v .+ cat([c * Δ for c = (0:r-1)]..., dims=i)
             else
                 ar = fill(b, [j == i ? r : size(a, j) for j = 1:d]...)
             end
@@ -100,3 +99,7 @@ function pad(a::AbstractArray, b, l::Int=1, r=l; kw...)
     pad(a, b, fill(l, d,), fill(r, d); kw...)
 end
 
+function pad(a::PaddedArray, b, l=1, r=l; kw...)
+    y = pad(a.a, b, l, r; kw...)
+    PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
+end
