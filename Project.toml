@@ -11,4 +11,5 @@ LazyArrays = "5078a376-72f3-5289-bfd5-ec5146d43c02"
 [compat]
 Functors = "0.4"
 LazyArrays = "1.8"
+Lazy= "0.15"
 julia = "1.9"
