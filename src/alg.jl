@@ -1,8 +1,8 @@
-function lr(a, b, i, l, r, out=true)
+function lr(a, b, i, l, r, out=true, ol=0, or=ol)
     d = ndims(a)
     al = ar = nothing
     if l > 0
-        o = out ? 0 : l
+        o = out ? 0 : l + ol
         if b == :periodic
             I = [j == i ? ((size(a, i)-l+1):size(a, i)) : (:) for j = 1:d]
             al = view(a, I...)
@@ -13,7 +13,7 @@ function lr(a, b, i, l, r, out=true)
             I = [j == i ? (l+1+o:-1:2+o) : (:) for j = 1:d]
             al = view(a, I...)
         elseif b == :replicate
-            I = [j == i ? (out ? (1:1) : ((1+l):(1+l))) : (:) for j = 1:d]
+            I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
             s = [j == i ? l : 1 for j = 1:d]
             al = repeat(view(a, I...), s...)
         elseif b == :smooth
@@ -25,7 +25,7 @@ function lr(a, b, i, l, r, out=true)
                 al = 2view(a, I...) - a[I2...]
             end
         elseif isa(b, ReplicateRamp)
-            I = [j == i ? (out ? (1:1) : ((1+l):(1+l))) : (:) for j = 1:d]
+            I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
             v = a[I...]
             Δ = (b.v .- v) / l
             al = v .+ cat([c * Δ for c = l-1:-1:0]..., dims=i)
@@ -34,12 +34,12 @@ function lr(a, b, i, l, r, out=true)
         end
     end
     if r > 0
-        o = out ? 0 : r
+        o = out ? 0 : r + or
         if b == :periodic
             I = [j == i ? (1:r) : (:) for j = 1:d]
             ar = view(a, I...)
         elseif b == :replicate
-            I = [j == i ? (out ? axes(a, i)[end:end] : axes(a, i)[end-r:end-r]) : (:) for j = 1:d]
+            I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             s = [j == i ? r : 1 for j = 1:d]
             ar = repeat(view(a, I...), s...)
         elseif b == :symmetric
@@ -57,7 +57,7 @@ function lr(a, b, i, l, r, out=true)
                 ar = 2view(a, I...) - a[I2...]
             end
         elseif isa(b, ReplicateRamp)
-            I = [j == i ? (out ? axes(a, i)[end:end] : axes(a, i)[end-r:end-r]) : (:) for j = 1:d]
+            I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             v = a[I...]
             Δ = (b.v .- v) / r
             ar = v .+ cat([c * Δ for c = (0:r-1)]..., dims=i)

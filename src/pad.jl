@@ -35,10 +35,10 @@ function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
     y = pad!(a.a, b, l, r)
     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
 end
-function pad!(a, b, l::Union{AbstractVector,Tuple}, r=l)
+function pad!(a, b, l::Union{AbstractVector,Tuple}, r=l, ol=zeros(Int, length(l)), or=ol)
     d = ndims(a)
-    for (i, l, r) in zip(1:d, l, r)
-        al, ar = lr(a, b, i, l, r, false)
+    for (i, l, r, ol, or) in zip(1:d, l, r, ol, or)
+        al, ar = lr(a, b, i, l, r, false, ol, or)
 
         if l > 0
             a[[j == i ? (1:l) : (:) for j = 1:d]...] = al
