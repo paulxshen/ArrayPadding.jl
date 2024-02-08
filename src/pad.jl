@@ -41,10 +41,10 @@ function pad!(a, b, l::Union{AbstractVector,Tuple}, r=l, ol=zeros(Int, length(l)
         al, ar = lr(a, b, i, l, r, false, ol, or)
 
         if l > 0
-            a[[j == i ? (1:l) : (:) for j = 1:d]...] = al
+            a[[j == i ? (1+ol:l+ol) : (:) for j = 1:d]...] = al
         end
         if r > 0
-            a[[j == i ? (size(a, i)-r+1:size(a, i)) : (:) for j = 1:d]...] = ar
+            a[[j == i ? (size(a, i)-r-or+1:size(a, i)-or) : (:) for j = 1:d]...] = ar
         end
     end
     a
