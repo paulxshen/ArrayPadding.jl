@@ -68,7 +68,11 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
     al, ar
 end
 
+Base.vec(x::Number, d) = fill(x, d)
+Base.vec(v::Union{AbstractVector,Tuple}, d) = v
 
+Base.view(b::Buffer, i...) = view(b.data, i...)
+# Base.view(b::Buffer, i...) = b[i...]
 
 function cat(a...; lazy=false, dims)
     if lazy
