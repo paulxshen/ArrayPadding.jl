@@ -29,12 +29,12 @@ pad!(array, border, left_pad_amount_for_dims, right_pad_amount_for_dims)
 a = collect(reshape(1:16, 4, 4))
 
 @test pad(a, -1, 1) == [
-    -1 -1 -1 -1 -1
+    -1 -1 -1 -1 -1 -1
     -1 1 5 9 13 -1
     -1 2 6 10 14 -1
     -1 3 7 11 15 -1
     -1 4 8 12 16 -1
-    -1 -1 -1 -1 -1
+    -1 -1 -1 -1 -1 -1
 ]
 
 @test pad!(a, -1, 1) == [
