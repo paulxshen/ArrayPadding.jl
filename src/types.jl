@@ -4,7 +4,7 @@ struct PaddedArray
     l
     r
     function PaddedArray(a, l=left(a), r=right(a))
-        new(collect(a), l, r)
+        new(a, l, r)
     end
 end
 # struct PaddedArray{T,N} <: AbstractArray{T,N}
