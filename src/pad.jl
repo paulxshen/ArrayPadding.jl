@@ -36,7 +36,7 @@ function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
 end
 function pad!(a::AbstractArray, args...)
-    a_ = bufferfrom(collect(a))
+    a_ = bufferfrom(a)
     pad!(a_, args...)
     copy(a_)
 end
