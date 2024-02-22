@@ -5,24 +5,24 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
         o = out ? 0 : l + ol
         if b == :periodic
             I = [j == i ? ((size(a, i)-l+1):size(a, i)) : (:) for j = 1:d]
-            al = view(a, I...)
+            al = a[I...]
         elseif b == :symmetric
             I = [j == i ? (l+o:-1:1+o) : (:) for j = 1:d]
-            al = view(a, I...)
+            al = a[I...]
         elseif b == :mirror
             I = [j == i ? (l+1+o:-1:2+o) : (:) for j = 1:d]
-            al = view(a, I...)
+            al = a[I...]
         elseif b == :replicate
             I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
             s = [j == i ? l : 1 for j = 1:d]
-            al = repeat(view(a, I...), s...)
+            al = repeat(a[I...], s...)
         elseif b == :smooth
             I = [j == i ? (1+o:1+o) : (:) for j = 1:d]
             if size(a, i) == 1
-                al = view(a, I...)
+                al = a[I...]
             else
                 I2 = [j == i ? (2+o:2+o) : (:) for j = 1:d]
-                al = 2view(a, I...) - a[I2...]
+                al = 2a[I...] - a[I2...]
             end
         elseif isa(b, ReplicateRamp)
             I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
@@ -37,24 +37,24 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
         o = out ? 0 : r + or
         if b == :periodic
             I = [j == i ? (1:r) : (:) for j = 1:d]
-            ar = view(a, I...)
+            ar = a[I...]
         elseif b == :replicate
             I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             s = [j == i ? r : 1 for j = 1:d]
-            ar = repeat(view(a, I...), s...)
+            ar = repeat(a[I...], s...)
         elseif b == :symmetric
             I = [j == i ? axes(a, i)[end-o:-1:end-r+1-o] : (:) for j = 1:d]
-            ar = view(a, I...)
+            ar = a[I...]
         elseif b == :mirror
             I = [j == i ? axes(a, i)[end-1-o:-1:end-r-o] : (:) for j = 1:d]
-            ar = view(a, I...)
+            ar = a[I...]
         elseif b == :smooth
             I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             if size(a, i) == 1
-                ar = view(a, I...)
+                ar = a[I...]
             else
                 I2 = [j == i ? axes(a, i)[end-o-1:end-o-1] : (:) for j = 1:d]
-                ar = 2view(a, I...) - a[I2...]
+                ar = 2a[I...] - a[I2...]
             end
         elseif isa(b, ReplicateRamp)
             I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
@@ -71,7 +71,7 @@ end
 Base.vec(x::Number, d) = fill(x, d)
 Base.vec(v::Union{AbstractVector,Tuple}, d) = v
 
-Base.view(b::Buffer, i...) = b[i...]
+# Base.view(b::Buffer, i...) = b[i...]
 
 function cat(a...; lazy=false, dims)
     if lazy

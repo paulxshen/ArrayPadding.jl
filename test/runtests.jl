@@ -1,6 +1,7 @@
 using Test
-using ArrayPadding
-# include("../src/main.jl")
+
+# using ArrayPadding
+include("../src/main.jl")
 
 a = collect(reshape(1:16, 4, 4))
 
@@ -13,7 +14,7 @@ a = collect(reshape(1:16, 4, 4))
     -1 -1 -1 -1 -1 -1
 ]
 
-@test pad!(a, -1, 1) == [
+@test pad!(copy(a), -1, 1) == [
     -1 -1 -1 -1
     -1 6 10 -1
     -1 7 11 -1
@@ -28,7 +29,7 @@ a = collect(reshape(1:16, 4, 4))
     -1 4 8 12 16
 ]
 
-@test pad!(a, -1, 1, 0) == [
+@test pad!(copy(a), -1, 1, 0) == [
     -1 -1 -1 -1
     -1 6 10 14
     -1 7 11 15
@@ -43,7 +44,7 @@ a = collect(reshape(1:16, 4, 4))
     -1 -1 -1 -1 -1
 ]
 
-@test pad!(a, -1, (0, 1), (1, 0)) == [
+@test pad!(copy(a), -1, (0, 1), (1, 0)) == [
     -1 5 9 13
     -1 6 10 14
     -1 7 11 15
@@ -58,7 +59,7 @@ a = collect(reshape(1:16, 4, 4))
     16 4 8 12 16
 ]
 
-@test pad!(a, :periodic, (1, 1), (0, 0)) == [
+@test pad!(copy(a), :periodic, (1, 1), (0, 0)) == [
     16 8 12 16
     14 6 10 14
     15 7 11 15
@@ -74,7 +75,7 @@ a = collect(reshape(1:16, 4, 4))
     4 4 8 12 16 16
 ]
 
-@test pad!(a, :symmetric, 1) == [
+@test pad!(copy(a), :symmetric, 1) == [
     6 6 10 10
     6 6 10 10
     7 7 11 11
@@ -90,7 +91,7 @@ a = collect(reshape(1:16, 4, 4))
     7 3 7 11 15 11
 ]
 
-@test pad!(a, :mirror, 1) == [
+@test pad!(copy(a), :mirror, 1) == [
     11 7 11 7
     10 6 10 6
     11 7 11 7
@@ -106,7 +107,7 @@ a = collect(reshape(1:16, 4, 4))
     4 4 8 12 16 16
 ]
 
-@test pad!(a, :replicate, 1) == [
+@test pad!(copy(a), :replicate, 1) == [
     6 6 10 10
     6 6 10 10
     7 7 11 11
@@ -122,9 +123,26 @@ a = collect(reshape(1:16, 4, 4))
     1 5 9 13 17 21
 ]
 
-@test pad!(a, :smooth, 1) == [
+@test pad!(copy(a), :smooth, 1) == [
     1 5 9 13
     2 6 10 14
     3 7 11 15
     4 8 12 16
 ]
+
+# a0 = copy(a)
+using Zygote
+using Zygote: Buffer
+
+@test withgradient(a) do a
+    a = pad(a, 0, 1)
+    sum(a)
+end == (val=136, grad=([1.0 1.0 1.0 1.0; 1.0 1.0 1.0 1.0; 1.0 1.0 1.0 1.0; 1.0 1.0 1.0 1.0],))
+
+@test withgradient(a) do a
+    a_ = Buffer(a)
+    a_ .= a
+    pad!(a_, 0, 1)
+    a = copy(a_)
+    sum(a)
+end == (val=34, grad=([0.0 0.0 0.0 0.0; 0.0 1.0 1.0 0.0; 0.0 1.0 1.0 0.0; 0.0 0.0 0.0 0.0],))

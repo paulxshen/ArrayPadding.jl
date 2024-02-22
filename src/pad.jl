@@ -35,12 +35,8 @@ function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
     y = pad!(a.a, b, l, r)
     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
 end
-function pad!(a::AbstractArray, args...)
-    a_ = bufferfrom(a)
-    a_ = pad!(a_, args...)
-    copy(a_)
-end
-function pad!(a::Buffer, b, l, r=l, ol=0, or=ol)
+
+function pad!(a, b, l, r=l, ol=0, or=ol)
     d = ndims(a)
     l, r, ol, or = vec.((l, r, ol, or), d)
     for (i, l, r, ol, or) in zip(1:d, l, r, ol, or)
