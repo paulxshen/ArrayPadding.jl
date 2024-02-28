@@ -31,10 +31,10 @@ function pad(a, b, l::Union{AbstractVector,Tuple}, r=l; lazy=false)
     end
     a
 end
-function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
-    y = pad!(a.a, b, l, r)
-    PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
-end
+# function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
+#     y = pad!(a.a, b, l, r)
+#     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
+# end
 
 function pad!(a, b, l, r=l, ol=0, or=ol)
     d = ndims(a)
