@@ -70,6 +70,7 @@ end
 
 Base.vec(x::Number, d) = fill(x, d)
 Base.vec(v::Union{AbstractVector,Tuple}, d) = v
+Base.ndims(a) = length(size(a))
 
 # Base.view(b::Buffer, i...) = b[i...]
 
