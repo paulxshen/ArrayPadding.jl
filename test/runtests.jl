@@ -1,7 +1,6 @@
 using Test
-
-# using ArrayPadding
-include("../src/main.jl")
+using ArrayPadding
+# include("../src/main.jl")
 
 a = collect(reshape(1:16, 4, 4))
 
@@ -141,7 +140,8 @@ end == (val=136, grad=([1.0 1.0 1.0 1.0; 1.0 1.0 1.0 1.0; 1.0 1.0 1.0 1.0; 1.0 1
 
 @test withgradient(a) do a
     a_ = Buffer(a)
-    a_ .= a
+    # a_ .= a
+    copyto!(a_, a)
     pad!(a_, 0, 1)
     a = copy(a_)
     sum(a)
