@@ -70,3 +70,9 @@ end
 
 Base.vec(x::Number, d) = fill(x, d)
 Base.vec(v::Union{AbstractVector,Tuple}, d) = v
+
+function cat(a...; lazy=false, dims)
+    if lazy
+    end
+    Base.cat(a...; dims)
+end
