@@ -1,6 +1,5 @@
 using Functors
 using Lazy: @forward
-using LazyArrays
 # using Zygote: Buffer, bufferfrom
 include("types.jl")
 include("alg.jl")

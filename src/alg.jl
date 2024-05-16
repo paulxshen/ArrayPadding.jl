@@ -70,19 +70,3 @@ end
 
 Base.vec(x::Number, d) = fill(x, d)
 Base.vec(v::Union{AbstractVector,Tuple}, d) = v
-# Base.ndims(a) = length(size(a))
-
-# Base.view(b::Buffer, i...) = b[i...]
-
-function cat(a...; lazy=false, dims)
-    if lazy
-        if dims == 1
-            return ApplyArray(vcat, a...)
-        elseif dims == 2
-            return ApplyArray(hcat, a...)
-        else
-            error("lazy padding only supported up to dim 2")
-        end
-    end
-    Base.cat(a...; dims)
-end
