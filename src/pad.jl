@@ -52,11 +52,11 @@ function pad!(a, b, l, r=l, ol=0, or=ol)
     a
 end
 
-function pad(a::AbstractArray, b, l::Int=1, r::Base.AbstractVecOrTuple; kw...)
+function pad(a::AbstractArray, b, l::Int, r::Base.AbstractVecOrTuple; kw...)
     d = ndims(a)
     pad(a, b, fill(l, d,), r; kw...)
 end
-function pad(a::AbstractArray, b, l::Base.AbstractVecOrTuple=1, r::Int; kw...)
+function pad(a::AbstractArray, b, l::Base.AbstractVecOrTuple, r::Int; kw...)
     d = ndims(a)
     pad(a, b, l, fill(r, d,); kw...)
 end
