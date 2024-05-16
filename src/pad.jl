@@ -16,7 +16,7 @@ Pads arrays of any dimension with various border options including constants, pe
 - `:smooth`: a b c | 2c-b (Maintains C1 continuity)
 - any other value `v`: a b c | v
 """
-function pad(a, b, l::Union{AbstractVector,Tuple}, r=l; lazy=false)
+function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l; lazy=false)
     # - `:C1`: a b c | 2c-b (Maintains C1 continuity)
     d = ndims(a)
     for (i, l, r) in zip(1:d, l, r)
@@ -52,7 +52,15 @@ function pad!(a, b, l, r=l, ol=0, or=ol)
     a
 end
 
-function pad(a::AbstractArray, b, l::Int=1, r=l; kw...)
+function pad(a::AbstractArray, b, l::Int=1, r::Base.AbstractVecOrTuple; kw...)
+    d = ndims(a)
+    pad(a, b, fill(l, d,), r; kw...)
+end
+function pad(a::AbstractArray, b, l::Base.AbstractVecOrTuple=1, r::Int; kw...)
+    d = ndims(a)
+    pad(a, b, l, fill(r, d,); kw...)
+end
+function pad(a::AbstractArray, b, l::Int=1, r::Int=l; kw...)
     d = ndims(a)
     pad(a, b, fill(l, d,), fill(r, d); kw...)
 end
