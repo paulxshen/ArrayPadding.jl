@@ -16,7 +16,7 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
             I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
             # s = [j == i ? l : 1 for j = 1:d]
             # al = repeat(a[I...], s...)
-            al = cat(fill(selectdim(a, i, o + 1), l)..., dims=i)
+            al = cat(fill(selectdim(a, i, o+1:o+1), l)..., dims=i)
         elseif b == :smooth
             I = [j == i ? (1+o:1+o) : (:) for j = 1:d]
             if size(a, i) == 1
@@ -43,7 +43,8 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
             # I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             # s = [j == i ? r : 1 for j = 1:d]
             # ar = repeat(a[I...], s...)
-            ar = cat(fill(selectdim(a, i, size(a, i) - o), r)..., dims=i)
+            j = size(a, i) - o
+            ar = cat(fill(selectdim(a, i, j:j), r)..., dims=i)
         elseif b == :symmetric
             I = [j == i ? axes(a, i)[end-o:-1:end-r+1-o] : (:) for j = 1:d]
             ar = a[I...]
