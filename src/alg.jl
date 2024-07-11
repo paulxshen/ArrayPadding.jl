@@ -29,7 +29,7 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
             I = [j == i ? ((1+o):(1+o)) : (:) for j = 1:d]
             v = a[I...]
             Δ = (b.v .- v) / l
-            al = v .+ cat([c * Δ for c = l-1:-1:0]..., dims=i)
+            al = v .+ cat([c * Δ for c = l:-1:1]..., dims=i)
         else
             al = fill(b, [j == i ? l : size(a, j) for j = 1:d]...)
         end
@@ -63,7 +63,7 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
             I = [j == i ? axes(a, i)[end-o:end-o] : (:) for j = 1:d]
             v = a[I...]
             Δ = (b.v .- v) / r
-            ar = v .+ cat([c * Δ for c = (0:r-1)]..., dims=i)
+            ar = v .+ cat([c * Δ for c = 1:r]..., dims=i)
         else
             ar = fill(b, [j == i ? r : size(a, j) for j = 1:d]...)
         end
