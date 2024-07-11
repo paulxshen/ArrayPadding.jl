@@ -1,4 +1,4 @@
-using Functors, StatsBase
+using Functors, Statistics
 using Lazy: @forward
 # using Zygote: Buffer, bufferfrom
 include("types.jl")
