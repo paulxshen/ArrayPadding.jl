@@ -1,7 +1,7 @@
 name = "ArrayPadding"
 uuid = "fe5ef43c-4912-423d-9170-4bd5cb6a013a"
 authors = ["Paul Shen <pxshen@alumni.stanford.edu>"]
-version = "0.1.24"
+version = "0.1.25"
 
 [deps]
 Functors = "d9f16b24-f501-4c13-a1f2-28368ffc5196"

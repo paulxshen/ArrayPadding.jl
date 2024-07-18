@@ -23,9 +23,9 @@ function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l;
         al, ar = lr(a, b, i, l, r)
 
         if l > 0
-            # a = cat(al, a; dims=i, lazy)
-            f = x -> reverse(x, dims=i)
-            a = cat(f(a), f(al); dims=i) |> f
+            a = cat(al, a; dims=i, lazy)
+            # f = x -> reverse(x, dims=i)
+            # a = cat(f(a), f(al); dims=i) |> f
         end
         if r > 0
             a = cat(a, ar; dims=i, lazy)
