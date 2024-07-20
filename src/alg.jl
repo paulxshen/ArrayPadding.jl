@@ -1,4 +1,4 @@
-function lr(a, b, i, l, r, out=true, ol=0, or=ol)
+function lr(a::T, b, i, l, r, out=true, ol=0, or=ol) where {T}
     d = ndims(a)
     al = ar = nothing
     if l > 0
@@ -68,7 +68,12 @@ function lr(a, b, i, l, r, out=true, ol=0, or=ol)
             ar = fill(b, [j == i ? r : size(a, j) for j = 1:d]...)
         end
     end
-    al, ar
+    if T <: AbstractGPUArray
+        return map((al, ar)) do x
+            isnothing(x) ? nothing : T(x)
+        end
+    end
+    return (al, ar)
 end
 
 Base.vec(x::Number, d) = fill(x, d)

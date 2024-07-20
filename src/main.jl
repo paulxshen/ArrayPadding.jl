@@ -1,4 +1,4 @@
-using Functors, Statistics
+using Functors, Statistics, GPUArraysCore
 using Lazy: @forward
 # using Zygote: Buffer, bufferfrom
 include("types.jl")
