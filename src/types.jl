@@ -23,7 +23,8 @@ left(a::AbstractArray) = 1
 right(a::AbstractArray) = 1
 left(a::PaddedArray) = a.l
 right(a::PaddedArray) = a.r
-Base.collect(a::PaddedArray) = a.a
+array(a::PaddedArray) = a.a
+array(a::AbstractArray) = a
 struct Ramp
     a
     b
