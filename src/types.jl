@@ -19,11 +19,10 @@ end
 
 
 @forward PaddedArray.a Base.length, Base.size, Base.iterate, Base.getindex, Base.ndims, cat, Base.cat, Base.eltype
-left(a::AbstractArray) = zeros(Int, ndims(a))
-right(a::AbstractArray) = zeros(Int, ndims(a))
+left(a::AbstractArray) = 1
+right(a::AbstractArray) = 1
 left(a::PaddedArray) = a.l
 right(a::PaddedArray) = a.r
-Base.Array(a::PaddedArray) = a.a
 Base.collect(a::PaddedArray) = a.a
 struct Ramp
     a
