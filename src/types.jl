@@ -1,18 +1,18 @@
 
-struct PaddedArray
+# struct PaddedArray 
+struct PaddedArray{T,N} <: AbstractArray{T,N}
     a
     l
     r
     function PaddedArray(a, l=left(a), r=right(a))
-        new(a, l, r)
+        new{eltype(a),ndims(a)}(array(a), l, r)
+        # new(a, l, r)
     end
 end
-# struct PaddedArray{T,N} <: AbstractArray{T,N}
 #     a
 #     l
 #     r
 #     function PaddedArray(a, l=left(a), r=right(a))
-#         new{eltype(a),ndims(a)}(collect(a), l, r)
 #     end
 # end
 @functor PaddedArray
