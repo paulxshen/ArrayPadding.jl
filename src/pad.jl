@@ -16,19 +16,26 @@ Pads arrays of any dimension with various border options including constants, pe
 - `:smooth`: a b c | 2c-b (Maintains C1 continuity)
 - any other value `v`: a b c | v
 """
-function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l; lazy=false)
-    # - `:C1`: a b c | 2c-b (Maintains C1 continuity)
+function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l)
+    if all(iszero, l) && all(iszero, r)
+        return a
+    end
+    if eltype(a) <: Number && eltype(b) <: Number
+        b = convert(eltype(a), b)
+    end
+
     d = ndims(a)
     for (i, l, r) in zip(1:d, l, r)
-        al, ar = lr(a, b, i, l, r)
-
-        if l > 0
-            a = cat(al, a; dims=i, lazy)
-            # f = x -> reverse(x, dims=i)
-            # a = cat(f(a), f(al); dims=i) |> f
-        end
-        if r > 0
-            a = cat(a, ar; dims=i, lazy)
+        if l > 0 || r > 0
+            al, ar = lr(a, b, i, l, r)
+            if l > 0
+                a = cat(al, a; dims=i)
+                # f = x -> reverse(x, dims=i)
+                # a = cat(f(a), f(al); dims=i) |> f
+            end
+            if r > 0
+                a = cat(a, ar; dims=i)
+            end
         end
     end
     a
@@ -56,18 +63,18 @@ end
 
 function pad(a::AbstractArray, b, l::Int, r::Base.AbstractVecOrTuple; kw...)
     d = ndims(a)
-    pad(a, b, fill(l, d,), r; kw...)
+    pad(a, b, fill(l, d,), r)
 end
 function pad(a::AbstractArray, b, l::Base.AbstractVecOrTuple, r::Int; kw...)
     d = ndims(a)
-    pad(a, b, l, fill(r, d,); kw...)
+    pad(a, b, l, fill(r, d,))
 end
-function pad(a::AbstractArray, b, l::Int=1, r::Int=l; kw...)
-    d = ndims(a)
-    pad(a, b, fill(l, d,), fill(r, d); kw...)
+function pad(a::AbstractArray, b, l::Int=1, r::Int=l; dims=1:ndims(a))
+    sel = in.(1:ndims(a), (dims,))
+    pad(a, b, l * sel, r * sel)
 end
 
-function pad(a::PaddedArray, b, l=1, r=l; kw...)
-    y = pad(a.a, b, l, r; kw...)
-    PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
-end
+# function pad(a::PaddedArray, b, l=1, r=l; kw...)
+#     y = pad(a.a, b, l, r; kw...)
+#     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
+# end
