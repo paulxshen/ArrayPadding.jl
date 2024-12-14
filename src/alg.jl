@@ -72,9 +72,9 @@ function lr(a::T, b, i, l, r, out=true, ol=0, or=ol) where {T}
             ar = fill(b, Tuple(sel .* r .+ (1 .- sel) .* size(a)))
         end
     end
-    al, ar = map((al, ar)) do x
-        isnothing(x) ? nothing : T(x)
-    end
+    # al, ar = map((al, ar)) do x
+    #     isnothing(x) ? nothing : T(x)
+    # end
     return (al, ar)
 end
 
