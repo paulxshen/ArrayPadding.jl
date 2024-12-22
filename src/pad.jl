@@ -17,9 +17,8 @@ Pads arrays of any dimension with various border options including constants, pe
 - any other value `v`: a b c | v
 """
 function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l)
-    if all(iszero, l) && all(iszero, r)
-        return a
-    end
+    all(iszero, l) && all(iszero, r) && return a
+
     if eltype(a) <: Number && eltype(b) <: Number
         b = convert(eltype(a), b)
     end
@@ -40,12 +39,10 @@ function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l)
     end
     a
 end
-# function pad!(a::PaddedArray, b, l::Union{AbstractVector,Tuple}, r=l)
-#     y = pad!(a.a, b, l, r)
-#     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
-# end
 
 function pad!(a, b, l, r=l, ol=0, or=ol)
+    all(iszero, l) && all(iszero, r) && return a
+
     d = ndims(a)
     l, r, ol, or = vec.((l, r, ol, or), d)
     for (i, l, r, ol, or) in zip(1:d, l, r, ol, or)
@@ -73,8 +70,3 @@ function pad(a::AbstractArray, b, l::Int=1, r::Int=l; dims=1:ndims(a))
     sel = in.(1:ndims(a), (dims,))
     pad(a, b, l * sel, r * sel)
 end
-
-# function pad(a::PaddedArray, b, l=1, r=l; kw...)
-#     y = pad(a.a, b, l, r; kw...)
-#     PaddedArray(y, Int.(l .+ left(a)), Int.(r .+ right(a)))
-# end
