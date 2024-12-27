@@ -16,7 +16,7 @@ Pads arrays of any dimension with various border options including constants, pe
 - `:smooth`: a b c | 2c-b (Maintains C1 continuity)
 - any other value `v`: a b c | v
 """
-function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l)
+function pad(a::T, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l) where {T}
     all(iszero, l) && all(iszero, r) && return a
 
     if eltype(a) <: Number && eltype(b) <: Number
@@ -28,12 +28,10 @@ function pad(a, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l)
         if l > 0 || r > 0
             al, ar = lr(a, b, i, l, r)
             if l > 0
-                a = cat(al, a; dims=i)
-                # f = x -> reverse(x, dims=i)
-                # a = cat(f(a), f(al); dims=i) |> f
+                a = cat(T(al), a; dims=i)
             end
             if r > 0
-                a = cat(a, ar; dims=i)
+                a = cat(a, T(ar); dims=i)
             end
         end
     end
