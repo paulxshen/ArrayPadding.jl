@@ -1,7 +1,7 @@
 
 struct Ramp
     a
-    b
+    v
 end
 struct ReplicateRamp
     v

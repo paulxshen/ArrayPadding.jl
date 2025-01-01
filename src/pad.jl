@@ -16,55 +16,53 @@ Pads arrays of any dimension with various border options including constants, pe
 - `:smooth`: a b c | 2c-b (Maintains C1 continuity)
 - any other value `v`: a b c | v
 """
-function pad(a::T, b, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l) where {T}
+function pad(a::T, v, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l) where {T}
     all(iszero, l) && all(iszero, r) && return a
-
-    if eltype(a) <: Number && eltype(b) <: Number
-        b = convert(eltype(a), b)
-    end
-
-    d = ndims(a)
-    for (i, l, r) in zip(1:d, l, r)
-        if l > 0 || r > 0
-            al, ar = lr(a, b, i, l, r)
-            if l > 0
-                a = cat(T(al), a; dims=i)
-            end
-            if r > 0
-                a = cat(a, T(ar); dims=i)
-            end
-        end
-    end
-    a
+    sz = Tuple(size(a) .+ l .+ r)
+    _a = Buffer(a, sz)
+    I = @ignore_derivatives range.(l .+ 1, sz .- r)
+    _a[I...] = a
+    pad!(_a, v, l, r)
+    copy(_a)
 end
 
-function pad!(a, b, l, r=l, ol=0, or=ol)
+function pad!(a, v, l, r=l)
     all(iszero, l) && all(iszero, r) && return a
-
-    d = ndims(a)
-    l, r, ol, or = vec.((l, r, ol, or), d)
-    for (i, l, r, ol, or) in zip(1:d, l, r, ol, or)
-        al, ar = lr(a, b, i, l, r, false, ol, or)
-
+    N = ndims(a)
+    l, r = vec.((l, r), N)
+    for (i, l, r) in zip(1:N, l, r)
+        sel = i .== 1:N
+        ax = axes(a, i)
+        al, ar = lr(a, v, i, l, r)
         if l > 0
-            a[[j == i ? (1+ol:l+ol) : (:) for j = 1:d]...] = al
+            I = ifelse.(sel, (ax[begin:begin+l-1],), :)
+            if isa(a, Buffer)
+                a[I...] = al
+            else
+                a[I...] .= al
+            end
         end
         if r > 0
-            a[[j == i ? (size(a, i)-r-or+1:size(a, i)-or) : (:) for j = 1:d]...] = ar
+            I = ifelse.(sel, (ax[end-r+1:end],), :)
+            if isa(a, Buffer)
+                a[I...] = ar
+            else
+                a[I...] .= ar
+            end
         end
     end
     a
 end
 
-function pad(a::AbstractArray, b, l::Int, r::Base.AbstractVecOrTuple; kw...)
-    d = ndims(a)
-    pad(a, b, fill(l, d,), r)
+function pad(a::AbstractArray, v, l::Int, r::Base.AbstractVecOrTuple; kw...)
+    N = ndims(a)
+    pad(a, v, fill(l, N,), r)
 end
-function pad(a::AbstractArray, b, l::Base.AbstractVecOrTuple, r::Int; kw...)
-    d = ndims(a)
-    pad(a, b, l, fill(r, d,))
+function pad(a::AbstractArray, v, l::Base.AbstractVecOrTuple, r::Int; kw...)
+    N = ndims(a)
+    pad(a, v, l, fill(r, N,))
 end
-function pad(a::AbstractArray, b, l::Int=1, r::Int=l; dims=1:ndims(a))
+function pad(a::AbstractArray, v, l::Int=1, r::Int=l; dims=1:ndims(a))
     sel = in.(1:ndims(a), (dims,))
-    pad(a, b, l * sel, r * sel)
+    pad(a, v, l * sel, r * sel)
 end
