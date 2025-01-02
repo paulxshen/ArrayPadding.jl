@@ -35,8 +35,8 @@ function lr(a::S, v, i, l, r) where {S}
         else
             if isa(a, Buffer)
 
-                # al = fillfunc(S)(T(v), (sel .* l .+ .!(sel) .* size(a))...)
-                al = fill(T(v), (sel .* l .+ .!(sel) .* size(a))...)
+                al = fillfunc(S)(T(v), (sel .* l .+ .!(sel) .* size(a))...)
+                # al = fill(T(v), (sel .* l .+ .!(sel) .* size(a))...)
             else
                 al = T(v)
             end
@@ -71,8 +71,8 @@ function lr(a::S, v, i, l, r) where {S}
             # ar = v .+ cat([c * Δ for c = 1:r]..., dims=i)
         else
             if isa(a, Buffer)
-                # ar = fillfunc(S)(T(v), (sel .* r .+ .!(sel) .* size(a))...)
-                ar = fill(T(v), (sel .* r .+ .!(sel) .* size(a))...)
+                ar = fillfunc(S)(T(v), (sel .* r .+ .!(sel) .* size(a))...)
+                # ar = fill(T(v), (sel .* r .+ .!(sel) .* size(a))...)
             else
                 ar = T(v)
             end
