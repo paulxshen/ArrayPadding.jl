@@ -1,4 +1,4 @@
-function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
+function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
     N = ndims(a)
     sz = size(a)
     T = eltype(a)
@@ -6,6 +6,7 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
     sel = (1:N) .== i
     al = ar = nothing
     if l > 0
+        v = _fv(v0, l)
         if v == :periodic
             I = ifelse.(sel, (ax[end-l+1:end],), :)
             al = a[I...]
@@ -27,7 +28,8 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     al = 2a[I...] - a[I2...]
             # end
         elseif isa(v, Function)
-            al = repeat(v.(constructor(S)(1:l)), (sel .+ .!(sel) .* sz)...)
+            b = reshape(v.(constructor(S)(1:l)), (l .* sel .+ .!(sel))...)
+            al = repeat(b, (sel .+ .!(sel) .* sz)...)
         else
             if dofill
                 f = fillfunc(S)
@@ -39,6 +41,7 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
         end
     end
     if r > 0
+        v = _fv(v0, r)
         if v == :periodic
             I = ifelse.(sel, (1:r,), :)
             ar = a[I...]
@@ -60,7 +63,8 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     ar = 2a[I...] - a[I2...]
             # end
         elseif isa(v, Function)
-            ar = repeat(v.(constructor(S)(1:r)), (sel .+ .!(sel) .* sz)...)
+            b = reshape(v.(constructor(S)(1:r)), (r .* sel .+ .!(sel))...)
+            ar = repeat(b, (sel .+ .!(sel) .* sz)...)
         else
             if dofill
                 f = fillfunc(S)
