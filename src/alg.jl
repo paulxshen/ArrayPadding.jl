@@ -1,5 +1,6 @@
 function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
     N = ndims(a)
+    sz = size(a)
     T = eltype(a)
     ax = axes(a, i)
     sel = (1:N) .== i
@@ -25,12 +26,8 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     I2 = [j == i ? (2+ol:2+ol)
             #     al = 2a[I...] - a[I2...]
             # end
-        elseif isa(v, ReplicateRamp)
-            # # @ignore_derivatives I[i]=((begin+ol):(begin+ol))
-            # @ignore_derivatives I[i]=((begin+ol):(begin+ol)) : (1:size(a, j)) for j = 1:N]
-            # v = a[I...]
-            # Δ = (v.v .- v) / l
-            # al = v .+ cat([c * Δ for c = l:-1:1]..., dims=i)
+        elseif isa(v, Function)
+            al = repeat(v.(constructor(S)(1:l)), (sel .+ .!(sel) .* sz)...)
         else
             if dofill
                 f = fillfunc(S)
@@ -62,11 +59,8 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     I2 = [j == i ? ax[end-or-1:end-or-1]
             #     ar = 2a[I...] - a[I2...]
             # end
-        elseif isa(v, ReplicateRamp)
-            # @ignore_derivatives I[i]=ax[end-or:end-or]
-            # v = a[I...]
-            # Δ = (v.v .- v) / r
-            # ar = v .+ cat([c * Δ for c = 1:r]..., dims=i)
+        elseif isa(v, Function)
+            ar = repeat(v.(constructor(S)(1:r)), (sel .+ .!(sel) .* sz)...)
         else
             if dofill
                 f = fillfunc(S)
@@ -79,8 +73,3 @@ function lr(a::S, v, i, l, r, ol=0, or=0, dofill=false) where {S}
     end
     return (al, ar)
 end
-
-Base.vec(x::Number, N) = fill(x, N)
-Base.vec(v::Union{AbstractVector,Tuple}, N) = v
-
-fillfunc(::Type{<:Array}) = (args...) -> Base.fill(args...)

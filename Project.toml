@@ -1,19 +1,18 @@
 name = "ArrayPadding"
 uuid = "fe5ef43c-4912-423d-9170-4bd5cb6a013a"
 authors = ["Paul Shen <pxshen@alumni.stanford.edu>"]
-version = "1.0.5"
+version = "1.0.6"
 
 [deps]
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [weakdeps]
-Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 
 [extensions]
 CUDAExt = "CUDA"
-ZygoteExt = "Zygote"
 
 [compat]
 CUDA = "5,6,7,8,9,10,11,12"
-Zygote = "0.7,0.8,1"
+Zygote = "0.6,0.7,0.8,1"
 julia = "1"

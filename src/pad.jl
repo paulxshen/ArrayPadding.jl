@@ -18,24 +18,24 @@ Pads arrays of any dimension with various border options including constants, pe
 """
 function pad(a::T, v, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l) where {T}
     all(iszero, l) && all(iszero, r) && return a
-    N = ndims(a)
-    l, r = vec.((l, r), N)
-    for (dims, l, r) in zip(1:N, l, r)
-        al, ar = lr(a, v, dims, l, r, 0, 0, true)
-        if l > 0
-            a = cat(al, a; dims)
-        end
-        if r > 0
-            a = cat(a, ar; dims)
-        end
-    end
-    a
-    # sz = Tuple(size(a) .+ l .+ r)
-    # _a = Buffer(a, sz)
-    # I = @ignore_derivatives range.(l .+ 1, sz .- r)
-    # _a[I...] = a
-    # pad!(_a, v, l, r)
-    # copy(_a)
+    # N = ndims(a)
+    # l, r = vec.((l, r), N)
+    # for (dims, l, r) in zip(1:N, l, r)
+    #     al, ar = lr(a, v, dims, l, r, 0, 0, true)
+    #     if l > 0
+    #         a = cat(al, a; dims)
+    #     end
+    #     if r > 0
+    #         a = cat(a, ar; dims)
+    #     end
+    # end
+    # a
+    sz = Tuple(size(a) .+ l .+ r)
+    _a = Buffer(a, sz)
+    I = @ignore_derivatives range.(l .+ 1, sz .- r)
+    _a[I...] = a
+    pad!(_a, v, l, r)
+    copy(_a)
 end
 
 function pad!(a, v, l, r=l)
