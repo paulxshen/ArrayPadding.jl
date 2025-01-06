@@ -28,7 +28,7 @@ function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     al = 2a[I...] - a[I2...]
             # end
         elseif isa(v, Function)
-            b = reshape(v.(constructor(S)(1:l)), (l .* sel .+ .!(sel))...)
+            b = reshape(constructor(S)(v.(1:l)), (l .* sel .+ .!(sel))...)
             al = repeat(b, (sel .+ .!(sel) .* sz)...)
         else
             if dofill
@@ -63,7 +63,7 @@ function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
             #     ar = 2a[I...] - a[I2...]
             # end
         elseif isa(v, Function)
-            b = reshape(v.(constructor(S)(1:r)), (r .* sel .+ .!(sel))...)
+            b = reshape(constructor(S)(v.(1:r)), (r .* sel .+ .!(sel))...)
             ar = repeat(b, (sel .+ .!(sel) .* sz)...)
         else
             if dofill
