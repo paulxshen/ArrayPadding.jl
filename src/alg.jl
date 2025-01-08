@@ -1,4 +1,4 @@
-function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
+function lblock(a::S, v0, i, l, ol=0, dofill=false) where {S}
     N = ndims(a)
     sz = size(a)
     T = eltype(a)
@@ -40,6 +40,13 @@ function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
             end
         end
     end
+end
+function rblock(a::S, v0, i, r, or=0, dofill=false) where {S}
+    N = ndims(a)
+    sz = size(a)
+    T = eltype(a)
+    ax = axes(a, i)
+    sel = (1:N) .== i
     if r > 0
         v = _fv(v0, r)
         if v == :periodic
@@ -75,5 +82,4 @@ function lr(a::S, v0, i, l, r, ol=0, or=0, dofill=false) where {S}
             end
         end
     end
-    return (al, ar)
 end

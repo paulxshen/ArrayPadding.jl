@@ -1,6 +1,6 @@
-
-Base.vec(x::Number, N) = fill(x, N)
-Base.vec(v::Union{AbstractVector,Tuple}, N) = v
+tuplewrap(x::Tuple) = x
+tuplewrap(x) = (x,)
+Base.identity(x...) = x
 
 fillfunc(::Type{<:Array}) = fill
 constructor(::Type{<:Array}) = Array

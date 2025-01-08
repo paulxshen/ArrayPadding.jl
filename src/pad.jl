@@ -16,7 +16,7 @@ Pads arrays of any dimension with various border options including constants, pe
 - `:smooth`: a b c | 2c-b (Maintains C1 continuity)
 - any other value `v`: a b c | v
 """
-function pad(a::T, v, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple=l) where {T}
+function pad(a::T, vl, vr, l, r) where {T}
     all(iszero, l) && all(iszero, r) && return a
     # N = ndims(a)
     # l, r = vec.((l, r), N)
@@ -34,18 +34,21 @@ function pad(a::T, v, l::Union{AbstractVector,Tuple}, r::Base.AbstractVecOrTuple
     _a = Buffer(a, sz)
     I = @ignore_derivatives range.(l .+ 1, sz .- r)
     _a[I...] = a
-    pad!(_a, v, l, r)
+    pad!(_a, vl, vr, l, r)
     copy(_a)
 end
+pad(a, v, l, r=l) = pad(a, v, v, l, r)
 
-function pad!(a, v, l, r=l)
+function pad!(a, vl, vr, l, r)
     all(iszero, l) && all(iszero, r) && return a
     N = ndims(a)
-    l, r = vec.((l, r), N)
-    for (i, l, r) in zip(1:N, l, r)
+    vl = tuplewrap(vl)
+    vr = tuplewrap(vr)
+    for (i, vl, vr, l, r) in broadcast(identity, 1:N, vl, vr, l, r)
         sel = i .== 1:N
         ax = axes(a, i)
-        al, ar = lr(a, v, i, l, r, l, r, !isa(a, AbstractArray))
+        al = lblock(a, vl, i, l, l, !isa(a, AbstractArray))
+        ar = rblock(a, vr, i, r, r, !isa(a, AbstractArray))
         if l > 0
             I = ifelse.(sel, (ax[begin:begin+l-1],), :)
             if !isa(a, AbstractArray)
@@ -65,16 +68,8 @@ function pad!(a, v, l, r=l)
     end
     a
 end
-
-function pad(a::AbstractArray, v, l::Int, r::Base.AbstractVecOrTuple; kw...)
-    N = ndims(a)
-    pad(a, v, fill(l, N,), r)
-end
-function pad(a::AbstractArray, v, l::Base.AbstractVecOrTuple, r::Int; kw...)
-    N = ndims(a)
-    pad(a, v, l, fill(r, N,))
-end
-function pad(a::AbstractArray, v, l::Int=1, r::Int=l; dims=1:ndims(a))
-    sel = in.(1:ndims(a), (dims,))
-    pad(a, v, l * sel, r * sel)
-end
+pad!(a, v, l, r=l) = pad!(a, v, v, l, r)
+# function pad(a::AbstractArray, v, l::Int=1, r::Int=l; dims=1:ndims(a))
+#     sel = in.(1:ndims(a), (dims,))
+#     pad(a, v, l * sel, r * sel)
+# end
