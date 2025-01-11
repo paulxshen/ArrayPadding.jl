@@ -42,14 +42,14 @@ pad(a, v, l, r=l) = pad(a, v, v, l, r)
 function pad!(a, vl, vr, l, r)
     all(iszero, l) && all(iszero, r) && return a
     N = ndims(a)
+    S = typeof(a)
     vl = tuplewrap(vl)
     vr = tuplewrap(vr)
     for (i, vl, vr, l, r) in broadcast(identity, 1:N, vl, vr, l, r)
         sel = i .== 1:N
         ax = axes(a, i)
-        al = lblock(a, vl, i, l, l, !isa(a, AbstractArray))
-        ar = rblock(a, vr, i, r, r, !isa(a, AbstractArray))
         if l > 0
+            al = lblock(a, vl, i, l, l)
             I = ifelse.(sel, (ax[begin:begin+l-1],), :)
             if !isa(a, AbstractArray)
                 a[I...] = al
@@ -58,6 +58,7 @@ function pad!(a, vl, vr, l, r)
             end
         end
         if r > 0
+            ar = rblock(a, vr, i, r, r)
             I = ifelse.(sel, (ax[end-r+1:end],), :)
             if !isa(a, AbstractArray)
                 a[I...] = ar
