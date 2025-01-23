@@ -4,18 +4,28 @@ function lblock(a::S, v, i, l, ol=0) where {S}
     T = eltype(a)
     ax = axes(a, i)
     sel = (1:N) .== i
+
+    depth_counts = sel .* l .+ .!(sel)
+    breadth_counts = sel .+ .!(sel) .* sz
+    counts = sel .* l .+ .!(sel) .* sz
+    depth_counts, breadth_counts, counts = @ignore_derivatives Tuple.((depth_counts, breadth_counts, counts))
+
     if v == :periodic
         I = ifelse.(sel, (ax[end-l+1:end],), :)
+        I = @ignore_derivatives I
         al = a[I...]
     elseif v == :symmetric
         I = ifelse.(sel, (ax[begin+ol+l-1:-1:begin+ol],), :)
+        I = @ignore_derivatives I
         al = a[I...]
     elseif v == :mirror
         I = ifelse.(sel, (ax[begin+ol+l:-1:begin+1+ol],), :)
+        I = @ignore_derivatives I
         al = a[I...]
     elseif v == :replicate
         I = ifelse.(sel, (ax[begin+ol:begin+ol],), :)
-        al = repeat(a[I...], (sel .* l .+ .!(sel))...)
+        I = @ignore_derivatives I
+        al = repeat(a[I...], depth_counts...)
     elseif v == :smooth
         # @ignore_derivatives I[i]=(begin+ol:begin+ol)
         # if size(a, i) == 1
@@ -31,35 +41,46 @@ function lblock(a::S, v, i, l, ol=0) where {S}
         else
             x = v.(x)
         end
-        b = reshape(constructor(S)(x), (l .* sel .+ .!(sel))...)
-        al = repeat(b, (sel .+ .!(sel) .* sz)...)
+        b = reshape(constructor(S)(x), depth_counts...)
+        al = repeat(b, breadth_counts...)
     else
         if S <: AbstractArray
             al = T(v)
         else
             f = fillfunc(S)
-            al = f(T(v), Tuple(sel .* l .+ .!(sel) .* size(a)))
+            al = f(T(v), counts)
         end
     end
     al
 end
+
 function rblock(a::S, v, i, r, or=0) where {S}
     N = ndims(a)
     sz = size(a)
     T = eltype(a)
     ax = axes(a, i)
     sel = (1:N) .== i
+
+    depth_counts = sel .* r .+ .!(sel)
+    breadth_counts = sel .+ .!(sel) .* sz
+    counts = sel .* r .+ .!(sel) .* sz
+    depth_counts, breadth_counts, counts = @ignore_derivatives Tuple.((depth_counts, breadth_counts, counts))
+
     if v == :periodic
         I = ifelse.(sel, (1:r,), :)
+        I = @ignore_derivatives I
         ar = a[I...]
     elseif v == :replicate
         I = ifelse.(sel, (ax[end-or:end-or],), :)
-        ar = repeat(a[I...], (sel .* r .+ .!(sel))...)
+        I = @ignore_derivatives I
+        ar = repeat(a[I...], depth_counts...)
     elseif v == :symmetric
         I = ifelse.(sel, (ax[end-or:-1:end-r+1-or],), :)
+        I = @ignore_derivatives I
         ar = a[I...]
     elseif v == :mirror
         I = ifelse.(sel, (ax[end-1-or:-1:end-r-or],), :)
+        I = @ignore_derivatives I
         ar = a[I...]
     elseif v == :smooth
         # @ignore_derivatives I[i]=ax[end-or:end-or]
@@ -76,14 +97,14 @@ function rblock(a::S, v, i, r, or=0) where {S}
         else
             x = v.(x)
         end
-        b = reshape(constructor(S)(x), (r .* sel .+ .!(sel))...)
-        ar = repeat(b, (sel .+ .!(sel) .* sz)...)
+        b = reshape(constructor(S)(x), depth_counts...)
+        ar = repeat(b, breadth_counts...)
     else
         if S <: AbstractArray
             ar = T(v)
         else
             f = fillfunc(S)
-            ar = f(T(v), Tuple(sel .* r .+ .!(sel) .* size(a)))
+            ar = f(T(v), counts)
         end
     end
     ar
