@@ -35,7 +35,7 @@ function lblock(a::S, v, i, l, ol=0) where {S}
         #     al = 2a[I...] - a[I2...]
         # end
     elseif isa(v, Function) || isa(v, TanhRamp)
-        x = T.(1:l)
+        x = T.(l:-1:1)
         if isa(v, TanhRamp)
             x = T(v.v) * tanh.(2x / l)
         else
@@ -43,6 +43,11 @@ function lblock(a::S, v, i, l, ol=0) where {S}
         end
         b = reshape(constructor(S)(x), depth_counts...)
         al = repeat(b, breadth_counts...)
+
+        # al = max.(al, selectdim(a, i, 1))
+        I = ifelse.(sel, (ax[begin+ol:begin+ol],), :)
+        edge = a[I...]
+        al = max.(al, edge)
     else
         if S <: AbstractArray
             al = T(v)
@@ -99,6 +104,11 @@ function rblock(a::S, v, i, r, or=0) where {S}
         end
         b = reshape(constructor(S)(x), depth_counts...)
         ar = repeat(b, breadth_counts...)
+        # ar = max.(ar, selectdim(a, i, size(a, i)))
+
+        I = ifelse.(sel, (ax[end-or:end-or],), :)
+        edge = a[I...]
+        ar = max.(ar, edge)
     else
         if S <: AbstractArray
             ar = T(v)

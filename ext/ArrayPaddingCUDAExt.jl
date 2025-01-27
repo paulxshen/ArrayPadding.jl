@@ -1,4 +1,4 @@
-module CUDAExt
+module ArrayPaddingCUDAExt
 using CUDA, ArrayPadding
 ArrayPadding.fillfunc(::Type{<:CuArray}) = CUDA.fill
 ArrayPadding.constructor(::Type{<:CuArray},) = cu

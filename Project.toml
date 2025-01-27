@@ -1,7 +1,7 @@
 name = "ArrayPadding"
 uuid = "fe5ef43c-4912-423d-9170-4bd5cb6a013a"
 authors = ["Paul Shen <pxshen@alumni.stanford.edu>"]
-version = "1.0.10"
+version = "1.0.11"
 
 [deps]
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
@@ -10,7 +10,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 
 [extensions]
-CUDAExt = "CUDA"
+ArrayPaddingCUDAExt = "CUDA"
 
 [compat]
 CUDA = "5,6,7,8,9,10,11,12"
