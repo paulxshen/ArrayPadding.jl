@@ -1,4 +1,4 @@
-tuplewrap(x::Tuple) = x
+tuplewrap(x::Union{Tuple,AbstractArray}) = x
 tuplewrap(x) = (x,)
 Base.identity(x...) = x
 
@@ -9,6 +9,6 @@ constructor(::Type{<:Array}) = Array
 fillfunc(::Type{<:Buffer{T,S}}) where {T,S} = fillfunc(S)
 constructor(::Type{<:Buffer{T,S}}) where {T,S} = constructor(S)
 
-struct TanhRamp
+struct Ramp
     v
 end

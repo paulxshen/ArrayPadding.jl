@@ -43,8 +43,6 @@ function pad!(a, vl, vr, l, r)
     all(iszero, l) && all(iszero, r) && return a
     N = ndims(a)
     S = typeof(a)
-    vl = tuplewrap(vl)
-    vr = tuplewrap(vr)
     for (i, vl, vr, l, r) in broadcast(identity, 1:N, vl, vr, l, r)
         sel = i .== 1:N
         ax = axes(a, i)

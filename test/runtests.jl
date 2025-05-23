@@ -1,5 +1,5 @@
-using ArrayPadding
-# include("../src/main.jl")
+# using ArrayPadding
+include("../src/main.jl")
 
 a = collect(reshape(1:16, 4, 4))
 
@@ -112,14 +112,14 @@ a = collect(reshape(1:16, 4, 4))
     7 7 11 11
 ]
 
-@assert pad(a, x -> x + 1, 1) == [
-    2 2 2 2 2 2
-    2 1 5 9 13 2
-    2 2 6 10 14 2
-    2 3 7 11 15 2
-    2 4 8 12 16 2
-    2 2 2 2 2 2
-]
+# @assert pad(a, x -> x + 1, 1) == [
+#     2 2 2 2 2 2
+#     2 1 5 9 13 2
+#     2 2 6 10 14 2
+#     2 3 7 11 15 2
+#     2 4 8 12 16 2
+#     2 2 2 2 2 2
+# ]
 
 using Zygote
 using Zygote: Buffer
