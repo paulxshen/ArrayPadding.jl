@@ -48,7 +48,7 @@ function lblock(a::S, v, i, l, ol=0) where {S}
     elseif isa(v, Function) || isa(v, Ramp)
         x = T.(l:-1:1)
         if isa(v, Ramp)
-            x = T(v.v) * x / l
+            x = T(v.v) * (x - 1) / (l - 1)
         else
             x = v.(x)
         end
@@ -121,7 +121,7 @@ function rblock(a::S, v, i, r, or=0) where {S}
     elseif isa(v, Function) || isa(v, Ramp)
         x = T.(1:r)
         if isa(v, Ramp)
-            x = T(v.v) * x / r
+            x = T(v.v) * (x - 1) / (r - 1)
         else
             x = v.(x)
         end
