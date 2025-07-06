@@ -11,4 +11,6 @@ constructor(::Type{<:Buffer{T,S}}) where {T,S} = constructor(S)
 
 struct Ramp
     v
+    start
+
 end

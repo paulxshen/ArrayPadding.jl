@@ -72,3 +72,27 @@ pad!(a, v, l, r=l) = pad!(a, v, v, l, r)
 #     sel = in.(1:ndims(a), (dims,))
 #     pad(a, v, l * sel, r * sel)
 # end
+function diffpad(a::AbstractArray{T,N}, vl, vr; dims) where {T,N}
+    # vl == vr == nothing && return diff(a; dims)
+    s = 1:N .== dims
+    l = !isnothing(vl)
+    r = !isnothing(vr)
+    n = size(a, dims)
+    # diff(pad(a, vl, vr, l * s, r * s); dims)
+    b = Buffer(a)
+    if l
+        I = ifelse.(s, (2:n,), :)
+        J = ifelse.(s, (1:1,), :)
+        b[I...] = diff(a; dims)
+        b[J...] = selectdim(a, dims, 1:1) - lblock(a, vl, dims, 1)
+    elseif r
+        I = ifelse.(s, (1:n-1,), :)
+        J = ifelse.(s, (n:n,), :)
+        b[I...] = diff(a; dims)
+        b[J...] = rblock(a, vr, dims, 1) - selectdim(a, dims, n:n)
+    else
+        error()
+    end
+    copy(b)
+end
+diffpad(a, vl, vr, dims) = diffpad(a, vl, vr; dims=dims)

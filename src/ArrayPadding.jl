@@ -1,4 +1,4 @@
 module ArrayPadding
 include("main.jl")
-export pad, pad!, Ramp
+export pad, pad!, diffpad, Ramp
 end # module Pad

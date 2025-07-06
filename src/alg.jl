@@ -45,10 +45,14 @@ function lblock(a::S, v, i, l, ol=0) where {S}
         #     I2 = [j == i ? (2+ol:2+ol)
         #     al = 2a[I...] - a[I2...]
         # end
+    elseif v == :taper
+        I1 = ifelse.(sel, (ax[1+ol:1+ol],), :)
+        I2 = ifelse.(sel, (ax[2+ol:2+ol],), :)
+        al = 4a[I1...] / 3 - a[I2...] / 3
     elseif isa(v, Function) || isa(v, Ramp)
         x = T.(l:-1:1)
         if isa(v, Ramp)
-            x = T(v.v) * (x - 1) / (l - 1)
+            x = T(v.v) * (x - 1 + v.start) / (l - 1 + v.start)
         else
             x = v.(x)
         end
@@ -121,7 +125,7 @@ function rblock(a::S, v, i, r, or=0) where {S}
     elseif isa(v, Function) || isa(v, Ramp)
         x = T.(1:r)
         if isa(v, Ramp)
-            x = T(v.v) * (x - 1) / (r - 1)
+            x = T(v.v) * (x - 1 + v.start) / (r - 1 + v.start)
         else
             x = v.(x)
         end
