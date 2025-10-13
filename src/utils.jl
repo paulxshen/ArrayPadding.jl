@@ -1,6 +1,5 @@
 tuplewrap(x::Union{Tuple,AbstractArray}) = x
 tuplewrap(x) = (x,)
-Base.identity(x...) = x
 
 fillfunc(::Type{<:Array}) = fill
 constructor(::Type{<:Array}) = Array
