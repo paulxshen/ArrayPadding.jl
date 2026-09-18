@@ -49,13 +49,13 @@ function lblock(a::S, v, i, l, ol=0) where {S}
         I1 = ifelse.(sel, (ax[1+ol:1+ol],), :)
         I2 = ifelse.(sel, (ax[2+ol:2+ol],), :)
         al = 4a[I1...] / 3 - a[I2...] / 3
-    elseif isa(v, Function) || isa(v, Ramp)
+    elseif isa(v, Function) 
         x = T.(l:-1:1)
-        if isa(v, Ramp)
-            x = T(v.v) * max.(0, x - v.nzero) / (l - v.nzero)
-        else
-            x = v.(x)
-        end
+        # if isa(v, Ramp)
+        #     x = T(v.v) * max.(0, x - v.nzero) / (l - v.nzero)
+        # else
+        # end
+        x = v.(x)
         b = reshape(constructor(S)(x), depth_counts...)
         al = repeat(b, breadth_counts...)
 
@@ -122,13 +122,13 @@ function rblock(a::S, v, i, r, or=0) where {S}
         #     I2 = [j == i ? ax[end-or-1:end-or-1]
         #     ar = 2a[I...] - a[I2...]
         # end
-    elseif isa(v, Function) || isa(v, Ramp)
+    elseif isa(v, Function) 
         x = T.(1:r)
-        if isa(v, Ramp)
-            x = T(v.v) * max.(0, x - v.nzero) / (r - v.nzero)
-        else
-            x = v.(x)
-        end
+        # if isa(v, Ramp)
+        #     x = T(v.v) * max.(0, x - v.nzero) / (r - v.nzero)
+        # else
+        # end
+        x = v.(x)
         b = reshape(constructor(S)(x), depth_counts...)
         ar = repeat(b, breadth_counts...)
         # ar = max.(ar, selectdim(a, i, size(a, i)))

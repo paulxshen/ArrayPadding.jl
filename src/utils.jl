@@ -8,7 +8,8 @@ constructor(::Type{<:Array}) = Array
 fillfunc(::Type{<:Buffer{T,S}}) where {T,S} = fillfunc(S)
 constructor(::Type{<:Buffer{T,S}}) where {T,S} = constructor(S)
 
-struct Ramp
-    v
-    nzero::Int
-end
+# struct Ramp
+#     f
+#     c
+#     z::Bool
+# end
