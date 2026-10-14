@@ -1,148 +1,34 @@
 const at, bt = Float32.([1 / 16 1] / [0.75^2 1; 1.75^2 1])
 const av, bv = Float32.([-0.25^3 -1 / 4] / [0.75^3 0.75; 1.75^3 1.75])
 
-function lblock(a::S, v, i, l, ol=0) where {S}
-    N = ndims(a)
-    sz = size(a)
-    T = eltype(a)
-    ax = axes(a, i)
-    sel = (1:N) .== i
+# indices selecting `J` along dim `i` and everything along the others
+slabidx(a, i, J) = @ignore_derivatives Base.setindex(ntuple(_ -> (:), ndims(a)), J, i)
+slab(a, i, J) = a[slabidx(a, i, J)...]
 
-    depth_counts = sel .* l .+ .!(sel)
-    breadth_counts = sel .+ .!(sel) .* sz
-    counts = sel .* l .+ .!(sel) .* sz
-    depth_counts, breadth_counts, counts = @ignore_derivatives Tuple.((depth_counts, breadth_counts, counts))
+# indices `k` cells in from the edge of a core inset by `o` from the left/right end of `ax`
+inward(ax, left, o, k) = left ? (first(ax) + o - 1) .+ k : (last(ax) - o + 1) .- k
 
-    if v == :periodic
-        I = ifelse.(sel, (ax[(end-l+1):end],), :)
-        I = @ignore_derivatives I
-        al = a[I...]
-    elseif v ∈ (:symmetric, :antisymmetric)
-        I = ifelse.(sel, (ax[(begin+ol+l-1):-1:(begin+ol)],), :)
-        I = @ignore_derivatives I
-        al = a[I...] * (-1)^(v == :antisymmetric)
-    elseif v == :mirror
-        I = ifelse.(sel, (ax[(begin+ol+l):-1:(begin+1+ol)],), :)
-        I = @ignore_derivatives I
-        al = a[I...]
-    elseif v == :replicate
-        I = ifelse.(sel, (ax[(begin+ol):(begin+ol)],), :)
-        I = @ignore_derivatives I
-        al = repeat(a[I...], depth_counts...)
-    elseif v == :smooth
-    elseif v == :v0
-        I1 = ifelse.(sel, (ax[(1+ol):(1+ol)],), :)
-        I2 = ifelse.(sel, (ax[(2+ol):(2+ol)],), :)
-        al = av * a[I1...] + bv * a[I2...]
-    elseif v == :t0
-        I1 = ifelse.(sel, (ax[(1+ol):(1+ol)],), :)
-        I2 = ifelse.(sel, (ax[(2+ol):(2+ol)],), :)
-        al = at * a[I1...] + bt * a[I2...]
-        # @ignore_derivatives I[i]=(begin+ol:begin+ol)
-        # if size(a, i) == 1
-        #     al = a[I...]
-        # else
-        #     I2 = [j == i ? (2+ol:2+ol)
-        #     al = 2a[I...] - a[I2...]
-        # end
-    elseif v == :taper
-        I1 = ifelse.(sel, (ax[(1+ol):(1+ol)],), :)
-        I2 = ifelse.(sel, (ax[(2+ol):(2+ol)],), :)
-        al = 4a[I1...] / 3 - a[I2...] / 3
-    elseif isa(v, Function)
-        x = l:-1:1
-        # if isa(v, Ramp)
-        #     x = T(v.v) * max.(0, x - v.nzero) / (l - v.nzero)
-        # else
-        # end
-        x = v.(x)
-        b = reshape(constructor(S)(x), depth_counts...)
-        al = repeat(b, breadth_counts...)
+# vector `x` laid out along dim `i`, on the same device as `a`
+along(a, i, x) = reshape(constructor(typeof(a))(x), Base.setindex(ntuple(_ -> 1, ndims(a)), length(x), i))
 
-        # al = max.(al, selectdim(a, i, 1))
-        I = ifelse.(sel, (ax[(begin+ol):(begin+ol)],), :)
-        edge = a[I...]
-        al = max.(al, edge)
-    else
-        if S <: AbstractArray
-            al = T(v)
-        else
-            f = fillfunc(S)
-            al = f(T(v), counts)
-        end
-    end
-    al
-end
+"""
+    block(a, v, i, n, left, o=0, o′=0)
 
-function rblock(a::S, v, i, r, or=0) where {S}
-    N = ndims(a)
-    sz = size(a)
-    T = eltype(a)
-    ax = axes(a, i)
-    sel = (1:N) .== i
+Border block `v` of depth `n` on the `left` (else right) side of dim `i`, for a core inset by `o` on that side and `o′` on the other. Returns anything broadcastable to the block's shape.
+"""
+function block(a, v, i, n, left, o=0, o′=0)
+    d = left ? (n:-1:1) : (1:n) # distance of each border cell from the core
+    cells(k, left=left, o=o) = slab(a, i, @ignore_derivatives inward(axes(a, i), left, o, k))
 
-    depth_counts = sel .* r .+ .!(sel)
-    breadth_counts = sel .+ .!(sel) .* sz
-    counts = sel .* r .+ .!(sel) .* sz
-    depth_counts, breadth_counts, counts = @ignore_derivatives Tuple.((depth_counts, breadth_counts, counts))
-
-    if v == :periodic
-        I = ifelse.(sel, (1:r,), :)
-        I = @ignore_derivatives I
-        ar = a[I...]
-    elseif v == :replicate
-        I = ifelse.(sel, (ax[(end-or):(end-or)],), :)
-        I = @ignore_derivatives I
-        ar = repeat(a[I...], depth_counts...)
-    elseif v == :taper
-        I1 = ifelse.(sel, (ax[(end-or):(end-or)],), :)
-        I2 = ifelse.(sel, (ax[(end-or-1):(end-or-1)],), :)
-        ar = 4a[I1...] / 3 - a[I2...] / 3
-    elseif v == :v0
-        I1 = ifelse.(sel, (ax[(end-or):(end-or)],), :)
-        I2 = ifelse.(sel, (ax[(end-or-1):(end-or-1)],), :)
-        ar = av * a[I1...] + bv * a[I2...]
-    elseif v == :t0
-        I1 = ifelse.(sel, (ax[(end-or):(end-or)],), :)
-        I2 = ifelse.(sel, (ax[(end-or-1):(end-or-1)],), :)
-        ar = at * a[I1...] + bt * a[I2...]
-    elseif v ∈ (:symmetric, :antisymmetric)
-        I = ifelse.(sel, (ax[(end-or):-1:(end-r+1-or)],), :)
-        I = @ignore_derivatives I
-        ar = a[I...] * (-1)^(v == :antisymmetric)
-    elseif v == :mirror
-        I = ifelse.(sel, (ax[(end-1-or):-1:(end-r-or)],), :)
-        I = @ignore_derivatives I
-        ar = a[I...]
-    elseif v == :smooth
-        # @ignore_derivatives I[i]=ax[end-or:end-or]
-        # if size(a, i) == 1
-        #     ar = a[I...]
-        # else
-        #     I2 = [j == i ? ax[end-or-1:end-or-1]
-        #     ar = 2a[I...] - a[I2...]
-        # end
-    elseif isa(v, Function)
-        x = 1:r
-        # if isa(v, Ramp)
-        #     x = T(v.v) * max.(0, x - v.nzero) / (r - v.nzero)
-        # else
-        # end
-        x = v.(x)
-        b = reshape(constructor(S)(x), depth_counts...)
-        ar = repeat(b, breadth_counts...)
-        # ar = max.(ar, selectdim(a, i, size(a, i)))
-
-        I = ifelse.(sel, (ax[(end-or):(end-or)],), :)
-        edge = a[I...]
-        ar = max.(ar, edge)
-    else
-        if S <: AbstractArray
-            ar = T(v)
-        else
-            f = fillfunc(S)
-            ar = f(T(v), counts)
-        end
-    end
-    ar
+    v == :periodic && return cells(d, !left, o′)
+    v == :symmetric && return cells(d)
+    v == :antisymmetric && return -cells(d)
+    v == :mirror && return cells(d .+ 1)
+    v == :replicate && return cells(1:1)
+    v == :smooth && return cells(1:1) .+ along(a, i, d) .* (cells(1:1) - cells(2:2))
+    v == :taper && return (4cells(1:1) - cells(2:2)) / 3
+    v == :v0 && return av * cells(1:1) + bv * cells(2:2)
+    v == :t0 && return at * cells(1:1) + bt * cells(2:2)
+    v isa Function && return max.(along(a, i, v.(d)), cells(1:1))
+    eltype(a)(v)
 end
