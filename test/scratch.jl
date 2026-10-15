@@ -1,4 +1,3 @@
-using CUDA
 using Zygote: Buffer
 a = Buffer([1], 2, 2)
 a[:, 1] .= 8
